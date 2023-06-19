@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/go-redis/redis"
 	"solace.dev/go/messaging"
 	"solace.dev/go/messaging/pkg/solace/config"
 	"solace.dev/go/messaging/pkg/solace/message"
@@ -43,6 +45,34 @@ func MessageHandlerEuro(message message.InboundMessage) {
 	fmt.Println(messageBody)
 
 }
+
+type Author struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
+func addCacheRedis(host string, password string) {
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     host,
+		Password: password,
+		DB:       0,
+	})
+
+	defer client.Close()
+
+	json, err := json.Marshal(Author{Name: "Elliot", Age: 25})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = client.Set("author1", json, 0).Err()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
 func main() {
 
 	// Configuration parameters
@@ -87,6 +117,8 @@ func main() {
 		if regErr := directReceiver.ReceiveAsync(MessageHandlerEuro); regErr != nil {
 			panic(regErr)
 		}
+
+		addCacheRedis(getEnv("RedisHost", "tcps://"), getEnv("RedisPassword", "password"))
 
 	}
 
