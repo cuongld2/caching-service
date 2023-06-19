@@ -1,1 +1,5 @@
-export CGO_ENABLED=1
+Does not support windows
+
+```bash
+sudo apt install libssl-dev
+```
