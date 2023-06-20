@@ -26,7 +26,7 @@ func assertEqual(a interface{}, b interface{}, message string) {
 }
 
 // Define Topic Prefix
-const TopicPrefix = "cdc/*/sqlserver"
+const TopicPrefix = "cdc/*/postgresql"
 
 func getEnv(key, def string) string {
 	if val, ok := os.LookupEnv(key); ok {
@@ -60,17 +60,11 @@ func MessageHandlerEuro(message message.InboundMessage) {
 		fmt.Println(err)
 	}
 
-	fmt.Println(result)
-
-	fmt.Println("aaaaaaaaaa")
-	fmt.Println(result["change"])
-
 	changeKind := (result["change"]).([]interface{})[0].(map[string]interface{})["kind"].(string)
 
 	if changeKind != "delete" {
 
 		data := (result["change"]).([]interface{})[0].(map[string]interface{})["columnvalues"]
-		fmt.Println("bbbbbbb")
 		fmt.Println(data)
 
 		blogId := data.([]interface{})[0]
